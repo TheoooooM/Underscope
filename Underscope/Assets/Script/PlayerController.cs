@@ -43,6 +43,14 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.RightArrow)) transform.Rotate(new Vector3(0,rotateSpeed* Time.deltaTime,0));
 
         if (moving && canMove) Move();
+        PointView();
+    }
+
+    void PointView()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.transform.position.y));
+        mousePos.y = transform.position.y;
+        transform.LookAt(mousePos);
     }
 
     private void Move()
