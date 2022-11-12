@@ -15,10 +15,17 @@ public class PlayerController : MonoBehaviour
     private bool canMove = true;
     public float life = 3;
 
+    private Rigidbody rb;
+
     private void Awake()
     {
         SetInput();
         Instance = this;
+    }
+
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody>();
     }
 
     private void SetInput()
@@ -42,7 +49,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector2 dir = input.Movement.Move.ReadValue<Vector2>();
         Vector3 movement = new Vector3(dir.x, 0, dir.y) * moveSpeed * Time.deltaTime;
-        transform.position += movement;
+        rb.AddForce(movement.normalized*moveSpeed, ForceMode.Force);
     }
 
     public void TakeDamage()

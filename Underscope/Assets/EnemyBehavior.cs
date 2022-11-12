@@ -27,6 +27,7 @@ public class EnemyBehavior : MonoBehaviour, IDamagable
     void Death()
     {
         gameObject.SetActive(false);
+        CameraController.Instance.Stray();
     }
 
     private void OnCollisionEnter(Collision collision)
