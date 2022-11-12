@@ -10,25 +10,13 @@ public class Reload : MonoBehaviour
     public AnimationCurve curve;
     public Vector2 perfectRange = new Vector2(100, 115);
     public Vector2 activeRange = new Vector2(116, 155);
+    public Gun gun;
 
-    public float standardReload = 3.0f;
-    public float activeReload = 2.25f;
-    public float perfectReload = 1.8f;
-    public float failedReload = 4.1f;
-
-    public State state = State.READY;
-    public enum State { READY, FIRING, RELOADING,};
-    
     private Coroutine _reload;
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            this.BeginReload();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space) && state == State.RELOADING)
+        if (Input.GetKeyDown(KeyCode.Space) && gun.state == Gun.State.RELOADING)
         {
             ManualReload();
         }
@@ -54,8 +42,8 @@ public class Reload : MonoBehaviour
     private IEnumerator Reloading()
     {
         yield return new WaitForEndOfFrame();
-        state = State.RELOADING;
-        for (float i = 0; i < 1; i+= Time.deltaTime / standardReload)
+        gun.state = Gun.State.RELOADING;
+        for (float i = 0; i < 1; i+= Time.deltaTime / gun.standardReload)
         {
             float value = Mathf.Lerp(0, 300, curve.Evaluate(i));
             slider.anchoredPosition = new Vector2(value,0);
@@ -68,23 +56,19 @@ public class Reload : MonoBehaviour
     private IEnumerator FinishReload(float duration, bool perfect)
     {
         yield return new WaitForSeconds(duration);
-        state = State.RELOADING;
+        gun.state = Gun.State.RELOADING;
         slider.anchoredPosition = new Vector2(0, 0);
         if (perfect)
-        {
-           
-        }
+            gun.PerfectReload();
         else
-        {
-            
-        }
+            gun.ActiveReload();
         reloadBar.SetActive(false);
     }
 
     private void PerfectReload(float value)
     {
         float t = Mathf.InverseLerp(0, 300, value);
-        float remaining = perfectReload - (t * standardReload);
+        float remaining = gun.perfectReload - (t * gun.standardReload);
         StartCoroutine(FinishReload(remaining, false));
         Debug.Log("PERFECT");
     }
@@ -92,7 +76,7 @@ public class Reload : MonoBehaviour
     private void ActiveReload(float value)
     {
         float t = Mathf.InverseLerp(0, 300, value);
-        float remaining = activeReload - (t * standardReload);
+        float remaining = gun.activeReload - (t * gun.standardReload);
         StartCoroutine(FinishReload(remaining, false));
         Debug.Log("RELOAD");
     }
@@ -100,7 +84,7 @@ public class Reload : MonoBehaviour
     private void FailedReload(float value)
     {
         float t = Mathf.InverseLerp(0, 300, value);
-        float remaining = failedReload - (t * standardReload);
+        float remaining = gun.failedReload - (t * gun.standardReload);
         StartCoroutine(FinishReload(remaining, false));
         Debug.Log("FAILED");
     }
